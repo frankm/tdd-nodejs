@@ -4,7 +4,7 @@
   "description": "tdd with express",
   "main": "app.js",
   "scripts": {
-    "start": "node app",
+    "start": "node index",
     "test": "jest --watch",
     "lint": "eslint ."
   },
@@ -45,7 +45,6 @@
     }
   },
   "prettier": {
-    "singleQuote": true,
-    "printWidth": 120
+    "singleQuote": true
   }
 }

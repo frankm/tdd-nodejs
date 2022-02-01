@@ -53,4 +53,18 @@ describe('User Registration', () => {
     expect(savedUser.username).toBe(user1.username);
     expect(savedUser.email).toBe(user1.email);
   });
+
+  it('hashes password in db', async () => {
+    const user1 = {
+      username: 'user1',
+      email: 'user1@mail.com',
+      password: 'P4ssword',
+    };
+
+    await request(app).post('/api/1.0/users').send(user1).expect(200);
+
+    const userList = await User.findAll();
+    const savedUser = userList[0];
+    expect(savedUser.password).not.toBe(user1.password);
+  });
 });

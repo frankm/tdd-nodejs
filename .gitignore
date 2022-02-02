@@ -37,3 +37,6 @@ lerna-debug.log*
 # SECRETS
 .env.*local
 *.sqlite
+
+# temp files
+temp*.js

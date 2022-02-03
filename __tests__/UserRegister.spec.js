@@ -104,4 +104,21 @@ describe('User Registration', () => {
       expect(body.validationErrors[field]).toBe(expectedMessage);
     }
   );
+
+  it('when email is not unique, returns msg: Email already in use', async () => {
+    await User.create({ ...validUser });
+    const response = await postUser();
+    const body = response.body;
+    expect(body.validationErrors.email).toBe('Email already in use');
+  });
+
+  it('returns error, when username is null & email is not unique', async () => {
+    await User.create({ ...validUser });
+    const invalidUser = { ...validUser, username: null };
+    const response = await postUser(invalidUser);
+    const body = response.body;
+    expect(Object.keys(body.validationErrors)).toEqual(
+      expect.arrayContaining(['username', 'email'])
+    );
+  });
 });

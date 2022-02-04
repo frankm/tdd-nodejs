@@ -135,6 +135,28 @@ describe('User Registration', () => {
       expect.arrayContaining(['username', 'email'])
     );
   });
+
+  it('creates inactive user', async () => {
+    await postUser();
+    const users = await User.findAll();
+    const savedUser = users[0];
+    expect(savedUser.active).toBe(false);
+  });
+
+  it('creates inactive user, when post set active to true', async () => {
+    const userSetTpActive = { ...validUser, active: true };
+    await postUser(userSetTpActive);
+    const users = await User.findAll();
+    const savedUser = users[0];
+    expect(savedUser.active).toBe(false);
+  });
+
+  it('creates activationToken for user', async () => {
+    await postUser();
+    const users = await User.findAll();
+    const savedUser = users[0];
+    expect(savedUser.activationToken).toBeTruthy();
+  });
 });
 
 describe('Internationalization', () => {

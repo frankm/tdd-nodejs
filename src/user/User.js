@@ -16,6 +16,13 @@ User.init(
     password: {
       type: Sequelize.STRING,
     },
+    active: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+    },
+    activationToken: {
+      type: Sequelize.STRING,
+    },
   },
   { sequelize, modelName: 'user' }
 );

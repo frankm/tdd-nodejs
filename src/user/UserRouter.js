@@ -3,22 +3,25 @@ const UserService = require('./UserService');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
 
-// prettier-ignore
-router.post('/api/1.0/users',
+router.post(
+  '/api/1.0/users',
   check('username')
-    .notEmpty().withMessage('username_null')
+    .notEmpty()
+    .withMessage('username_null')
     .bail()
     .isLength({ min: 4, max: 32 })
     .withMessage('username_size'),
   check('email')
-    .notEmpty().withMessage('email_null')
+    .notEmpty()
+    .withMessage('email_null')
     .bail()
-    .isEmail().withMessage('email_invalid')
+    .isEmail()
+    .withMessage('email_invalid')
     .bail()
     .custom(async (email) => {
-      const user = await UserService.findByEmail(email)
+      const user = await UserService.findByEmail(email);
       if (user) {
-        throw new Error('email_notUnique')
+        throw new Error('email_notUnique');
       }
     }),
   check('password')
@@ -35,13 +38,11 @@ router.post('/api/1.0/users',
 
     if (!errors.isEmpty()) {
       const validationErrors = {};
-      errors
-        .array()
-        .forEach((error) => (validationErrors[error.param] = req.t(error.msg)));
+      errors.array().forEach((error) => (validationErrors[error.param] = req.t(error.msg)));
       return res.status(400).send({ validationErrors: validationErrors });
     }
-      await UserService.save(req.body);
-      return res.send({ message: req.t('user_create_success') });
+    await UserService.save(req.body);
+    return res.send({ message: req.t('user_create_success') });
   }
 );
 

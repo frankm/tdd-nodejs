@@ -19,6 +19,7 @@
     "i18next": "^21.6.10",
     "i18next-fs-backend": "^1.1.4",
     "i18next-http-middleware": "^3.1.6",
+    "nodemailer": "^6.7.2",
     "sequelize": "^6.15.0",
     "sqlite3": "github:mapbox/node-sqlite3"
   },
@@ -27,6 +28,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^27.4.7",
+    "nodemailer-stub": "^1.2.2",
     "prettier": "^2.5.1",
     "supertest": "^6.2.2"
   },

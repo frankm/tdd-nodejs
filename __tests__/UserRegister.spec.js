@@ -3,6 +3,7 @@ const app = require('../src/app');
 const User = require('../src/user/User');
 const sequelize = require('../src/config/db');
 const nodemailerStub = require('nodemailer-stub');
+const EmailService = require('../src/email/EmailService');
 
 beforeAll(() => {
   return sequelize.sync();
@@ -78,9 +79,7 @@ describe('User Registration', () => {
     const invalidUser = { ...validUser, username: null, email: null };
     const response = await postUser(invalidUser);
     const body = response.body;
-    expect(Object.keys(body.validationErrors)).toEqual(
-      expect.arrayContaining(['username', 'email'])
-    );
+    expect(Object.keys(body.validationErrors)).toEqual(expect.arrayContaining(['username', 'email']));
   });
   const username_null = 'Username cannot be null';
   const username_size = 'Must have min 4 & max 32 characters';
@@ -88,8 +87,7 @@ describe('User Registration', () => {
   const email_invalid = 'Email is not valid';
   const password_null = 'Password cannot be null';
   const password_size = 'Password must be at least 6 characters';
-  const password_pattern =
-    'Password must have at least 1 uppercase, 1 lowercase letter, & 1 number';
+  const password_pattern = 'Password must have at least 1 uppercase, 1 lowercase letter, & 1 number';
   const email_notUnique = 'Email already in use';
 
   it.each`
@@ -109,16 +107,13 @@ describe('User Registration', () => {
     ${'password'} | ${'lower4nd567'}   | ${password_pattern}
     ${'password'} | ${'lowerandUPPER'} | ${password_pattern}
     ${'password'} | ${'UPPER5555'}     | ${password_pattern}
-  `(
-    'when $field is $value returns msg: $expectedMessage',
-    async ({ field, expectedMessage, value }) => {
-      const user = { ...validUser };
-      user[field] = value;
-      const response = await postUser(user);
-      const body = response.body;
-      expect(body.validationErrors[field]).toBe(expectedMessage);
-    }
-  );
+  `('when $field is $value returns msg: $expectedMessage', async ({ field, expectedMessage, value }) => {
+    const user = { ...validUser };
+    user[field] = value;
+    const response = await postUser(user);
+    const body = response.body;
+    expect(body.validationErrors[field]).toBe(expectedMessage);
+  });
 
   it('when email is not unique, returns msg: ${email_notUnique}', async () => {
     await User.create({ ...validUser });
@@ -132,9 +127,7 @@ describe('User Registration', () => {
     const invalidUser = { ...validUser, username: null };
     const response = await postUser(invalidUser);
     const body = response.body;
-    expect(Object.keys(body.validationErrors)).toEqual(
-      expect.arrayContaining(['username', 'email'])
-    );
+    expect(Object.keys(body.validationErrors)).toEqual(expect.arrayContaining(['username', 'email']));
   });
 
   it('creates inactive user', async () => {
@@ -158,15 +151,43 @@ describe('User Registration', () => {
     const savedUser = users[0];
     expect(savedUser.activationToken).toBeTruthy();
   });
-});
 
-it('emails activationToken', async () => {
-  await postUser();
-  const lastMail = nodemailerStub.interactsWithMail.lastMail();
-  expect(lastMail.to[0]).toBe(validUser.email);
-  const users = await User.findAll();
-  const savedUser = users[0];
-  expect(lastMail.content).toContain(savedUser.activationToken);
+  it('emails activationToken', async () => {
+    await postUser();
+    const lastMail = nodemailerStub.interactsWithMail.lastMail();
+    expect(lastMail.to[0]).toBe(validUser.email);
+    const users = await User.findAll();
+    const savedUser = users[0];
+    expect(lastMail.content).toContain(savedUser.activationToken);
+  });
+
+  it('returns 502 Bad Gateway, when activation email fails', async () => {
+    const mockSendActivation = jest
+      .spyOn(EmailService, 'sendAccountActivation')
+      .mockRejectedValue({ message: 'Failed to deliver email' });
+    const response = await postUser();
+    expect(response.status).toBe(502);
+    mockSendActivation.mockRestore();
+  });
+
+  it('returns Email Failure Message, when activation email fails', async () => {
+    const mockSendActivation = jest
+      .spyOn(EmailService, 'sendAccountActivation')
+      .mockRejectedValue({ message: 'Failed to deliver email' });
+    const response = await postUser();
+    mockSendActivation.mockRestore();
+    expect(response.body.message).toBe('Email Failure');
+  });
+
+  it('does not save user to db, when activation email fails', async () => {
+    const mockSendActivation = jest
+      .spyOn(EmailService, 'sendAccountActivation')
+      .mockRejectedValue({ message: 'Failed to deliver email' });
+    await postUser();
+    mockSendActivation.mockRestore();
+    const users = await User.findAll();
+    expect(users.length).toBe(0);
+  });
 });
 
 describe('Internationalization', () => {
@@ -176,10 +197,10 @@ describe('Internationalization', () => {
   const email_invalid = 'E-Posta geçerli değil';
   const password_null = 'Şifre boş olamaz';
   const password_size = 'Şifre en az 6 karakter olmalı';
-  const password_pattern =
-    'Şifrede en az 1 büyük, 1 küçük harf ve 1 sayı bulunmalıdır';
+  const password_pattern = 'Şifrede en az 1 büyük, 1 küçük harf ve 1 sayı bulunmalıdır';
   const email_inuse = 'Bu E-Posta kullanılıyor';
   const user_create_success = 'Kullanıcı oluşturuldu';
+  const email_failure = 'E-Posta gönderiminde hata oluştu';
 
   it.each`
     field         | value              | expectedMessage
@@ -218,5 +239,14 @@ describe('Internationalization', () => {
   it(`returns success message of ${user_create_success} when signup request is valid & language is turkish`, async () => {
     const response = await postUser({ ...validUser }, { language: 'tr' });
     expect(response.body.message).toBe(user_create_success);
+  });
+
+  it(`when email fails & language is turkish, returns ${email_failure}`, async () => {
+    const mockSendActivation = jest
+      .spyOn(EmailService, 'sendAccountActivation')
+      .mockRejectedValue({ message: 'Failed to deliver email' });
+    const response = await postUser({ ...validUser }, { language: 'tr' });
+    mockSendActivation.mockRestore();
+    expect(response.body.message).toBe(email_failure);
   });
 });

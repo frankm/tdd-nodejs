@@ -28,8 +28,9 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^27.4.7",
-    "nodemailer-stub": "^1.2.2",
+    "jest-watch-typeahead": "^1.0.0",
     "prettier": "^2.5.1",
+    "smtp-server": "^3.9.0",
     "supertest": "^6.2.2"
   },
   "eslintConfig": {
@@ -56,5 +57,11 @@
   "prettier": {
     "singleQuote": true,
     "printWidth": 120
+  },
+  "jest": {
+    "watchPlugins": [
+      "jest-watch-typeahead/filename",
+      "jest-watch-typeahead/testname"
+    ]
   }
 }

@@ -13,6 +13,28 @@ if (process.env.NODE_ENV === 'development') {
 dotenv.config({ path: priority });
 dotenv.config({ path: shared });
 
+let mail;
+if (process.env.NODE_ENV === 'development') {
+  mail = {
+    host: get('MAIL_HOST').asString(),
+    port: get('MAIL_PORT').asPortNumber(),
+    auth: {
+      user: get('MAIL_USER').asString(),
+      pass: get('MAIL_PASS').asString(),
+    },
+  };
+}
+
+if (process.env.NODE_ENV === 'test') {
+  mail = {
+    host: get('MAIL_HOST').asString(),
+    port: get('MAIL_PORT').asPortNumber(),
+    tls: {
+      rejectUnauthorized: get('REJECT_UNAUTHORIZED').asBoolStrict(),
+    },
+  };
+}
+
 const appConfig = {
   db: {
     name: get('DATABASE').asString(),
@@ -22,6 +44,7 @@ const appConfig = {
     storage: get('DB_STORAGE').asString(),
     logging: get('DB_LOGGING').default('false').asBoolStrict(),
   },
+  mail: { ...mail },
 };
 
 module.exports = appConfig;

@@ -1,11 +1,8 @@
 const nodemailer = require('nodemailer');
+const appConfig = require('./config');
 
-const transporter = nodemailer.createTransport({
-  host: 'localhost',
-  port: 8587,
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+const mailConfig = appConfig.mail;
+
+const transporter = nodemailer.createTransport({ ...mailConfig });
 
 module.exports = transporter;

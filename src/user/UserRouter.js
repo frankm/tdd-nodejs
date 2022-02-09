@@ -2,10 +2,12 @@ const express = require('express');
 const UserService = require('./UserService');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
-const ValidationException = require('../error/ValidationException');
+
+const usersUrl = '/api/1.0/users';
+const tokenUrl = usersUrl + '/token/';
 
 router.post(
-  '/api/1.0/users',
+  usersUrl,
   check('username')
     .notEmpty()
     .withMessage('username_null')
@@ -19,12 +21,7 @@ router.post(
     .isEmail()
     .withMessage('email_invalid')
     .bail()
-    .custom(async (email) => {
-      const user = await UserService.findByEmail(email);
-      if (user) {
-        throw new Error('email_notUnique');
-      }
-    }),
+    .custom(async (email) => UserService.checkEmailIsUnique(email)),
   check('password')
     .notEmpty()
     .withMessage('password_null')
@@ -35,20 +32,17 @@ router.post(
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/)
     .withMessage('password_pattern'),
   async (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(new ValidationException(errors.array()));
-    }
     try {
+      await UserService.checkNoErrors(validationResult(req));
       await UserService.save(req.body);
-      return res.send({ message: req.t('user_create_success') });
+      res.send({ message: req.t('user_create_success') });
     } catch (err) {
-      next(err);
+      return next(err);
     }
   }
 );
 
-router.post('/api/1.0/users/token/:token', async (req, res, next) => {
+router.post(tokenUrl + ':token', async (req, res, next) => {
   const token = req.params.token;
   try {
     await UserService.activate(token);

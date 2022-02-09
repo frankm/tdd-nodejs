@@ -6,6 +6,7 @@ const EmailService = require('../email/EmailService');
 const sequelize = require('../config/db');
 const EmailException = require('../email/EmailException');
 const InvalidTokenException = require('./InvalidTokenException');
+const ValidationException = require('../error/ValidationException');
 
 const generateToken = (length) => {
   return crypto.randomBytes(length).toString('hex').substring(0, length);
@@ -30,6 +31,19 @@ const findByEmail = async (email) => {
   return await User.findOne({ where: { email: email } });
 };
 
+const checkEmailIsUnique = async (email) => {
+  const user = await findByEmail(email);
+  if (user) {
+    throw new Error('email_notUnique');
+  }
+};
+
+const checkNoErrors = async (errors) => {
+  if (!errors.isEmpty()) {
+    throw new ValidationException(errors.array());
+  }
+};
+
 const activate = async (token) => {
   const user = await User.findOne({ where: { activationToken: token } });
   if (!user) {
@@ -40,4 +54,4 @@ const activate = async (token) => {
   await user.save();
 };
 
-module.exports = { save, findByEmail, activate };
+module.exports = { save, findByEmail, activate, checkEmailIsUnique, checkNoErrors };

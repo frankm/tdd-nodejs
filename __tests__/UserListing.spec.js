@@ -60,17 +60,28 @@ describe('Listing Users', () => {
     const response = await getUsers();
     expect(response.body.content.length).toBe(6);
   });
-
   it('returns only id, username, and email in content array, for each user', async () => {
     await addUsers(11);
     const response = await getUsers();
     const user = response.body.content[0];
     expect(Object.keys(user).sort()).toEqual(['id', 'username', 'email'].sort());
   });
-
   it('returns 2 totalPages, when 15 active and 7 inactive users', async () => {
     await addUsers(15, 7);
     const response = await getUsers();
     expect(response.body.totalPages).toBe(2);
+  });
+
+  it('returns users on 2nd page, when page index 1 is requested', async () => {
+    await addUsers(11);
+    const response = await getUsers().query({ page: 1 });
+    expect(response.body.content[0].username).toBe('user11');
+    expect(response.body.page).toBe(1);
+  });
+
+  it('returns users on 1st page, when negative page index is requested', async () => {
+    await addUsers(11);
+    const response = await getUsers().query({ page: -5 });
+    expect(response.body.page).toBe(0);
   });
 });

@@ -53,7 +53,11 @@ router.post(tokenUrl + ':token', async (req, res, next) => {
 });
 
 router.get(usersUrl, async (req, res) => {
-  res.send(await UserService.getUsers());
+  let page = req.query.page ? Number.parseInt(req.query.page) : 0;
+  if (page < 0) {
+    page = 0;
+  }
+  res.send(await UserService.getUsers(page));
 });
 
 module.exports = router;

@@ -2,6 +2,7 @@ const express = require('express');
 const UserService = require('./UserService');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
+const pagination = require('../middleware/pagination');
 
 const usersUrl = '/api/1.0/users';
 const tokenUrl = usersUrl + '/token/';
@@ -52,12 +53,10 @@ router.post(tokenUrl + ':token', async (req, res, next) => {
   }
 });
 
-router.get(usersUrl, async (req, res) => {
-  let page = req.query.page ? Number.parseInt(req.query.page) : 0;
-  if (page < 0) {
-    page = 0;
-  }
-  res.send(await UserService.getUsers(page));
+router.get(usersUrl, pagination, async (req, res) => {
+  const { page, size } = req.pagination;
+  const users = await UserService.getUsers(page, size);
+  res.send(users);
 });
 
 module.exports = router;

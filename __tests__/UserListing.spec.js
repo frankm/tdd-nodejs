@@ -71,17 +71,39 @@ describe('Listing Users', () => {
     const response = await getUsers();
     expect(response.body.totalPages).toBe(2);
   });
-
-  it('returns users on 2nd page, when page index 1 is requested', async () => {
+  it('returns users on 2nd page and page index, when page index 1 is requested', async () => {
     await addUsers(11);
     const response = await getUsers().query({ page: 1 });
     expect(response.body.content[0].username).toBe('user11');
     expect(response.body.page).toBe(1);
   });
-
   it('returns users on 1st page, when negative page index is requested', async () => {
     await addUsers(11);
     const response = await getUsers().query({ page: -5 });
     expect(response.body.page).toBe(0);
+  });
+  it('returns 5 users and page size, when size 5 is requested', async () => {
+    await addUsers(11);
+    const response = await getUsers().query({ size: 5 });
+    expect(response.body.content.length).toBe(5);
+    expect(response.body.size).toBe(5);
+  });
+  it('returns 10 users and page size, when size 1000 is requested', async () => {
+    await addUsers(11);
+    const response = await getUsers().query({ size: 1000 });
+    expect(response.body.content.length).toBe(10);
+    expect(response.body.size).toBe(10);
+  });
+  it('returns 10 users and page size, when size 0 is requested', async () => {
+    await addUsers(11);
+    const response = await getUsers().query({ size: 0 });
+    expect(response.body.content.length).toBe(10);
+    expect(response.body.size).toBe(10);
+  });
+  it('returns page index = 0 and size = 10, when non-numbers are provided for page and size', async () => {
+    await addUsers(11);
+    const response = await getUsers().query({ size: 'size', page: 'page' });
+    expect(response.body.page).toBe(0);
+    expect(response.body.size).toBe(10);
   });
 });

@@ -67,4 +67,10 @@ describe('Listing Users', () => {
     const user = response.body.content[0];
     expect(Object.keys(user).sort()).toEqual(['id', 'username', 'email'].sort());
   });
+
+  it('returns 2 totalPages, when 15 active and 7 inactive users', async () => {
+    await addUsers(15, 7);
+    const response = await getUsers();
+    expect(response.body.totalPages).toBe(2);
+  });
 });

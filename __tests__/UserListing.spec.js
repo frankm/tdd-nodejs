@@ -34,6 +34,14 @@ const addUsers = async (activeUserCount, inactiveUserCount = 0) => {
   }
 };
 
+const createUser = async (active = true) => {
+  return await User.create({
+    username: 'user1',
+    email: 'user1@mail.com',
+    active: active,
+  });
+};
+
 describe('Listing Users', () => {
   it('returns 200 OK, when no users in db', async () => {
     const response = await getUsers();
@@ -105,5 +113,49 @@ describe('Listing Users', () => {
     const response = await getUsers().query({ size: 'size', page: 'page' });
     expect(response.body.page).toBe(0);
     expect(response.body.size).toBe(10);
+  });
+});
+
+describe('Get User', () => {
+  const getUser = (id = 5) => {
+    return request(app).get(usersUrl + '/' + id);
+  };
+  it('returns 404, when user not found', async () => {
+    const response = await getUser();
+    expect(response.status).toBe(404);
+  });
+
+  it.each`
+    language | message
+    ${'tr'}  | ${'Kullanıcı bulunamadı'}
+    ${'en'}  | ${'User not found'}
+  `('returns $message for unknown user when language is set to $language', async ({ language, message }) => {
+    const response = await getUser().set('Accept-Language', language);
+    expect(response.body.message).toBe(message);
+  });
+  it('returns proper error body, when user not found', async () => {
+    const nowInMillis = new Date().getTime();
+    const response = await getUser();
+    const error = response.body;
+    expect(error.path).toBe(usersUrl + '/5');
+    expect(error.timestamp).toBeGreaterThan(nowInMillis);
+    expect(Object.keys(error)).toEqual(['path', 'timestamp', 'message']);
+  });
+  it('returns 200, when active user exists', async () => {
+    const validUser = await createUser();
+    const response = await getUser(validUser.id);
+    expect(response.status).toBe(200);
+  });
+
+  it('returns only id, username, and email in response body, when active user exists', async () => {
+    const validUser = await createUser();
+    const response = await getUser(validUser.id);
+    expect(Object.keys(response.body)).toEqual(['id', 'username', 'email']);
+  });
+
+  it('returns 404, when user is inactive', async () => {
+    const inactiveUser = await createUser(false);
+    const response = await getUser(inactiveUser.id);
+    expect(response.status).toBe(404);
   });
 });

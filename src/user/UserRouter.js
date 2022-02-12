@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const UserService = require('./UserService');
 const { check, validationResult } = require('express-validator');
+const ForbiddenException = require('../error/ForbiddenException');
 const pagination = require('../middleware/pagination');
 
 const usersUrl = '/api/1.0/users';
@@ -66,6 +67,10 @@ router.get(usersUrl + '/:id', async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+router.put(usersUrl + '/:id', () => {
+  throw new ForbiddenException('unauthroized_user_update');
 });
 
 module.exports = router;

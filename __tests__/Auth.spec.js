@@ -10,6 +10,7 @@ const tr = require('../locales/tr/translation.json');
 beforeAll(async () => {
   await sequelize.sync();
 });
+
 beforeEach(async () => {
   await User.destroy({ truncate: true });
 });

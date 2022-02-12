@@ -1,21 +1,18 @@
 const app = require('./src/app');
 const sequelize = require('./src/config/db');
 const User = require('./src/user/User');
-
-const range = (start, end) => {
-  if (end === undefined) {
-    end = start;
-    start = 1;
-  }
-  return [...Array(end - start + 1).keys()].map((i) => start + i);
-};
+const Utils = require('./src/shared/Utils');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const addUsers = async (activeUserCount, inactiveUserCount = 0) => {
-  for (const i of range(activeUserCount + inactiveUserCount)) {
+  const hash = await bcrypt.hash('P4ssword', saltRounds);
+  for (const i of Utils.range(activeUserCount + inactiveUserCount)) {
     await User.create({
       username: `user${i}`,
       email: `user${i}@mail.com`,
       active: i <= activeUserCount,
+      password: hash,
     });
   }
 };

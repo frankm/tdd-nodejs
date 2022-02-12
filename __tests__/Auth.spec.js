@@ -4,12 +4,14 @@ const User = require('../src/user/User');
 const sequelize = require('../src/config/db');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const en = require('../locales/en/translation.json');
+const tr = require('../locales/tr/translation.json');
 
 beforeAll(async () => {
   await sequelize.sync();
 });
-beforeEach(() => {
-  User.destroy({ truncate: true });
+beforeEach(async () => {
+  await User.destroy({ truncate: true });
 });
 
 const authenticationUrl = '/api/1.0/auth';
@@ -64,8 +66,8 @@ describe('Authentication', () => {
 
   it.each`
     language | message
-    ${'tr'}  | ${'Kullanıcı bilgileri hatalı'}
-    ${'en'}  | ${'Incorrect credentials'}
+    ${'tr'}  | ${tr.authentication_failure}
+    ${'en'}  | ${en.authentication_failure}
   `('returns $message when authentication fails and language is set as $language', async ({ language, message }) => {
     const response = await postAuthentication({ email: activeUser.email, password: activeUser.password }, { language });
     expect(response.body.message).toBe(message);
@@ -96,8 +98,8 @@ describe('Authentication', () => {
 
   it.each`
     language | message
-    ${'tr'}  | ${'Hesabınız aktif değil'}
-    ${'en'}  | ${'Account is inactive'}
+    ${'tr'}  | ${tr.inactive_authentication_failure}
+    ${'en'}  | ${en.inactive_authentication_failure}
   `(
     'returns $message when authentication fails for inactive account and language is set as $language',
     async ({ language, message }) => {

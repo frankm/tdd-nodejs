@@ -8,6 +8,7 @@ const EmailException = require('../email/EmailException');
 const InvalidTokenException = require('./InvalidTokenException');
 const ValidationException = require('../error/ValidationException');
 const UserNotFoundException = require('./UserNotFoundException');
+const ForbiddenException = require('../error/ForbiddenException');
 
 const generateToken = (length) => {
   return crypto.randomBytes(length).toString('hex').substring(0, length);
@@ -32,14 +33,14 @@ const findByEmail = async (email) => {
   return await User.findOne({ where: { email: email } });
 };
 
-const checkEmailIsUnique = async (email) => {
+const mustHaveUniqueEmail = async (email) => {
   const user = await findByEmail(email);
   if (user) {
     throw new Error('email_notUnique');
   }
 };
 
-const checkNoErrors = async (errors) => {
+const mustHaveNoErrors = async (errors) => {
   if (!errors.isEmpty()) {
     throw new ValidationException(errors.array());
   }
@@ -83,4 +84,28 @@ const getUser = async (id) => {
   }
   return user;
 };
-module.exports = { save, findByEmail, activate, checkEmailIsUnique, checkNoErrors, getUsers, getUser };
+
+const updateUser = async (id, updatedBody) => {
+  const user = await User.findOne({ where: { id: id } });
+  user.username = updatedBody.username;
+  await user.save();
+};
+
+const mustHaveAuthenticatedForURLId = async (authenticatedUser, id) => {
+  // eslint-disable-next-line eqeqeq
+  if (!authenticatedUser || authenticatedUser.id != id) {
+    throw new ForbiddenException('unauthorized_user_update');
+  }
+};
+
+module.exports = {
+  save,
+  findByEmail,
+  activate,
+  mustHaveUniqueEmail,
+  mustHaveNoErrors,
+  getUsers,
+  getUser,
+  updateUser,
+  mustHaveAuthenticatedForURLId,
+};

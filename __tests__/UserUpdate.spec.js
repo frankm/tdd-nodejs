@@ -51,8 +51,8 @@ describe('User Update', () => {
 
   it.each`
     language | message
-    ${'tr'}  | ${tr.unauthroized_user_update}
-    ${'en'}  | ${en.unauthroized_user_update}
+    ${'tr'}  | ${tr.unauthorized_user_update}
+    ${'en'}  | ${en.unauthorized_user_update}
   `(
     'returns error body with $message for unauthorized request when language is $language',
     async ({ language, message }) => {
@@ -91,5 +91,24 @@ describe('User Update', () => {
       auth: { email: inactiveUser.email, password: activeUser.email },
     });
     expect(response.status).toBe(403);
+  });
+
+  it('returns 200 ok, when valid update request from authorized user', async () => {
+    const savedUser = await addUser();
+    const validUpdate = { username: 'user1-updated' };
+    const response = await putUser(savedUser.id, validUpdate, {
+      auth: { email: savedUser.email, password: 'P4ssword' },
+    });
+    expect(response.status).toBe(200);
+  });
+
+  it('update username in db, when valid update request from authorized user', async () => {
+    const savedUser = await addUser();
+    const validUpdate = { username: 'user1-updated' };
+    await putUser(savedUser.id, validUpdate, {
+      auth: { email: savedUser.email, password: 'P4ssword' },
+    });
+    const inDBUser = await User.findOne({ where: { id: savedUser.id } });
+    expect(inDBUser.username).toBe(validUpdate.username);
   });
 });

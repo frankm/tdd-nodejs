@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const UserService = require('./UserService');
 const { check, validationResult } = require('express-validator');
-const ForbiddenException = require('../error/ForbiddenException');
 const pagination = require('../middleware/pagination');
+const basicAuthentication = require('../middleware/basicAuthentication');
 
 const usersUrl = '/api/1.0/users';
 const tokenUrl = usersUrl + '/token/';
@@ -23,7 +23,7 @@ router.post(
     .isEmail()
     .withMessage('email_invalid')
     .bail()
-    .custom(async (email) => UserService.checkEmailIsUnique(email)),
+    .custom(async (email) => UserService.mustHaveUniqueEmail(email)),
   check('password')
     .notEmpty()
     .withMessage('password_null')
@@ -35,7 +35,7 @@ router.post(
     .withMessage('password_pattern'),
   async (req, res, next) => {
     try {
-      await UserService.checkNoErrors(validationResult(req));
+      await UserService.mustHaveNoErrors(validationResult(req));
       await UserService.save(req.body);
       res.send({ message: req.t('user_create_success') });
     } catch (err) {
@@ -69,8 +69,14 @@ router.get(usersUrl + '/:id', async (req, res, next) => {
   }
 });
 
-router.put(usersUrl + '/:id', () => {
-  throw new ForbiddenException('unauthroized_user_update');
+router.put(usersUrl + '/:id', basicAuthentication, async (req, res, next) => {
+  try {
+    await UserService.mustHaveAuthenticatedForURLId(req.authenticatedUser, req.params.id);
+    await UserService.updateUser(req.params.id, req.body);
+    return res.send();
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;

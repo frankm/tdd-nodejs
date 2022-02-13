@@ -2,6 +2,8 @@ const request = require('supertest');
 const app = require('../src/app');
 const User = require('../src/user/User');
 const sequelize = require('../src/config/db');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 const Utils = require('../src/shared/Utils');
 const en = require('../locales/en/translation.json');
 const tr = require('../locales/tr/translation.json');
@@ -16,26 +18,36 @@ beforeEach(async () => {
   await User.destroy({ truncate: true });
 });
 
-const getUsers = () => {
-  return request(app).get(usersUrl);
+const getUsers = (options = {}) => {
+  const agent = request(app).get(usersUrl);
+  if (options.auth) {
+    const { email, password } = options.auth;
+    agent.auth(email, password);
+  }
+  return agent;
 };
 
 const addUsers = async (activeUserCount, inactiveUserCount = 0) => {
+  const hash = await bcrypt.hash('P4ssword', saltRounds);
   for (const i of Utils.range(activeUserCount + inactiveUserCount)) {
     await User.create({
       username: `user${i}`,
       email: `user${i}@mail.com`,
       active: i <= activeUserCount,
+      password: hash,
     });
   }
 };
 
+const activeUser = {
+  username: 'user1',
+  email: 'user1@mail.com',
+  password: 'P4ssword',
+  active: true,
+};
+
 const createUser = async (active = true) => {
-  return await User.create({
-    username: 'user1',
-    email: 'user1@mail.com',
-    active: active,
-  });
+  return await User.create({ ...activeUser, active: active });
 };
 
 describe('Listing Users', () => {
@@ -110,6 +122,12 @@ describe('Listing Users', () => {
     expect(response.body.page).toBe(0);
     expect(response.body.size).toBe(10);
   });
+
+  it('returns user list without user, when valid authorization', async () => {
+    await addUsers(11);
+    const response = await getUsers({ auth: { email: activeUser.email, password: activeUser.password } });
+    expect(response.body.totalPages).toBe(1);
+  });
 });
 
 describe('Get User', () => {
@@ -138,14 +156,14 @@ describe('Get User', () => {
     expect(Object.keys(error)).toEqual(['path', 'timestamp', 'message']);
   });
   it('returns 200, when active user exists', async () => {
-    const validUser = await createUser();
-    const response = await getUser(validUser.id);
+    const activeUser = await createUser();
+    const response = await getUser(activeUser.id);
     expect(response.status).toBe(200);
   });
 
   it('returns only id, username, and email in response body, when active user exists', async () => {
-    const validUser = await createUser();
-    const response = await getUser(validUser.id);
+    const activeUser = await createUser();
+    const response = await getUser(activeUser.id);
     expect(Object.keys(response.body)).toEqual(['id', 'username', 'email']);
   });
 

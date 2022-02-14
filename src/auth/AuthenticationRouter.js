@@ -1,36 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const UserService = require('../user/UserService');
-const AuthenticationException = require('./AuthenticationException');
-const ForbiddenException = require('../error/ForbiddenException');
-const bcrypt = require('bcrypt');
+const AuthenticationService = require('../auth/AuthenticationService');
 const { check, validationResult } = require('express-validator');
+const TokenService = require('../auth/TokenService');
 
 const authUrl = '/api/1.0/auth';
 
 router.post(authUrl, check('email').isEmail(), async (req, res, next) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return next(new AuthenticationException());
-  }
-  const { email, password } = req.body;
 
-  const user = await UserService.findByEmail(email);
-  if (!user) {
-    return next(new AuthenticationException());
+  try {
+    await AuthenticationService.mustHaveNoErrors(errors);
+    const { email, password } = req.body;
+    const user = await UserService.findByEmail(email);
+    await AuthenticationService.mustHaveAuthenticatedActiveUser(user, password);
+    const token = TokenService.createToken(user);
+    res.send({
+      id: user.id,
+      username: user.username,
+      token,
+    });
+  } catch (err) {
+    next(err);
   }
-
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) {
-    return next(new AuthenticationException());
-  }
-  if (!user.active) {
-    return next(new ForbiddenException());
-  }
-  res.send({
-    id: user.id,
-    username: user.username,
-  });
 });
 
 module.exports = router;

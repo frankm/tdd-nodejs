@@ -9,6 +9,7 @@ const en = require('../locales/en/translation.json');
 const tr = require('../locales/tr/translation.json');
 
 const usersUrl = '/api/1.0/users';
+const authUrl = '/api/1.0/auth';
 
 beforeAll(async () => {
   await sequelize.sync();
@@ -18,11 +19,19 @@ beforeEach(async () => {
   await User.destroy({ truncate: true });
 });
 
+const auth = async (options = {}) => {
+  let token;
+  if (options.auth) {
+    const response = await request(app).post(authUrl).send(options.auth);
+    token = response.body.token;
+  }
+  return token;
+};
+
 const getUsers = (options = {}) => {
   const agent = request(app).get(usersUrl);
-  if (options.auth) {
-    const { email, password } = options.auth;
-    agent.auth(email, password);
+  if (options.token) {
+    agent.set('Authorization', `Bearer ${options.token}`);
   }
   return agent;
 };
@@ -125,7 +134,8 @@ describe('Listing Users', () => {
 
   it('returns user list without user, when valid authorization', async () => {
     await addUsers(11);
-    const response = await getUsers({ auth: { email: activeUser.email, password: activeUser.password } });
+    const token = await auth({ auth: { email: activeUser.email, password: activeUser.password } });
+    const response = await getUsers({ token: token });
     expect(response.body.totalPages).toBe(1);
   });
 });

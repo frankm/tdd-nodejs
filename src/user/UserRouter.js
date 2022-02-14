@@ -3,7 +3,7 @@ const router = express.Router();
 const UserService = require('./UserService');
 const { check, validationResult } = require('express-validator');
 const pagination = require('../middleware/pagination');
-const basicAuthentication = require('../middleware/basicAuthentication');
+const tokenAuthentication = require('../middleware/tokenAuthentication');
 
 const usersUrl = '/api/1.0/users';
 const tokenUrl = usersUrl + '/token/';
@@ -54,7 +54,7 @@ router.post(tokenUrl + ':token', async (req, res, next) => {
   }
 });
 
-router.get(usersUrl, pagination, basicAuthentication, async (req, res) => {
+router.get(usersUrl, pagination, tokenAuthentication, async (req, res) => {
   const authenticatedUser = req.authenticatedUser;
   const { page, size } = req.pagination;
   const users = await UserService.getUsers(page, size, authenticatedUser);
@@ -70,7 +70,7 @@ router.get(usersUrl + '/:id', async (req, res, next) => {
   }
 });
 
-router.put(usersUrl + '/:id', basicAuthentication, async (req, res, next) => {
+router.put(usersUrl + '/:id', tokenAuthentication, async (req, res, next) => {
   try {
     await UserService.mustHaveAuthenticatedForURLId(req.authenticatedUser, req.params.id);
     await UserService.updateUser(req.params.id, req.body);

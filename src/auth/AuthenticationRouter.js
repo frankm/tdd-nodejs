@@ -6,6 +6,7 @@ const { check, validationResult } = require('express-validator');
 const TokenService = require('../auth/TokenService');
 
 const authUrl = '/api/1.0/auth';
+const logoutUrl = '/api/1.0/logout';
 
 router.post(authUrl, check('email').isEmail(), async (req, res, next) => {
   const errors = validationResult(req);
@@ -24,6 +25,16 @@ router.post(authUrl, check('email').isEmail(), async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+router.post(logoutUrl, async (req, res) => {
+  const authorization = req.headers.authorization;
+  if (authorization) {
+    const removePrefix = 'Bearer '.length;
+    const token = authorization.substring(removePrefix);
+    await TokenService.deleteToken(token);
+  }
+  res.send();
 });
 
 module.exports = router;

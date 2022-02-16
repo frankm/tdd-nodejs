@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../src/app');
 const User = require('../src/user/User');
+const Token = require('../src/auth/Token');
 const sequelize = require('../src/config/db');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -16,6 +17,7 @@ beforeEach(async () => {
 });
 
 const authenticationUrl = '/api/1.0/auth';
+const logoutUrl = '/api/1.0/logout';
 const activeUser = {
   username: 'user1',
   email: 'user1@mail.com',
@@ -35,6 +37,14 @@ const postAuthentication = async (credentials, options = {}) => {
     agent.set('Accept-Language', options.language);
   }
   return await agent.send(credentials);
+};
+
+const postLogout = (options = {}) => {
+  const agent = request(app).post(logoutUrl);
+  if (options.token) {
+    agent.set('Authorization', `Bearer ${options.token}`);
+  }
+  return agent.send();
 };
 
 describe('Authentication', () => {
@@ -125,5 +135,21 @@ describe('Authentication', () => {
     await addUser();
     const response = await postAuthentication({ email: 'user1@mail.com', password: 'P4ssword' });
     expect(response.body.token).not.toBeUndefined();
+  });
+});
+
+describe('Logout', () => {
+  it('returns 200 ok, when unauthorized logout request ', async () => {
+    const response = await postLogout();
+    expect(response.status).toBe(200);
+  });
+
+  it('removes token from db ', async () => {
+    await addUser();
+    const response = await postAuthentication({ email: activeUser.email, password: activeUser.password });
+    const token = response.body.token;
+    await postLogout({ token: token });
+    const storedToken = await Token.findOne({ where: { token: token } });
+    expect(storedToken).toBeNull();
   });
 });

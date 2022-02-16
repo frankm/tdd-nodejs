@@ -93,10 +93,20 @@ const updateUser = async (id, updatedBody) => {
   await user.save();
 };
 
-const mustHaveAuthenticatedForURLId = async (authenticatedUser, id) => {
+const deleteUser = async (id) => {
+  await User.destroy({ where: { id: id } });
+};
+
+const mustHaveAuthenticatedToUpdateParamId = async (authenticatedUser, id) => {
   // eslint-disable-next-line eqeqeq
   if (!authenticatedUser || authenticatedUser.id != id) {
     throw new ForbiddenException('unauthorized_user_update');
+  }
+};
+const mustHaveAuthenticatedToDeleteParamId = async (authenticatedUser, id) => {
+  // eslint-disable-next-line eqeqeq
+  if (!authenticatedUser || authenticatedUser.id != id) {
+    throw new ForbiddenException('unauthorized_user_delete');
   }
 };
 
@@ -109,5 +119,7 @@ module.exports = {
   getUsers,
   getUser,
   updateUser,
-  mustHaveAuthenticatedForURLId,
+  deleteUser,
+  mustHaveAuthenticatedToUpdateParamId,
+  mustHaveAuthenticatedToDeleteParamId,
 };

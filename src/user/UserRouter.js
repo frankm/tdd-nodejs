@@ -72,9 +72,19 @@ router.get(usersUrl + '/:id', async (req, res, next) => {
 
 router.put(usersUrl + '/:id', tokenAuthentication, async (req, res, next) => {
   try {
-    await UserService.mustHaveAuthenticatedForURLId(req.authenticatedUser, req.params.id);
+    await UserService.mustHaveAuthenticatedToUpdateParamId(req.authenticatedUser, req.params.id);
     await UserService.updateUser(req.params.id, req.body);
     return res.send();
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete(usersUrl + '/:id', tokenAuthentication, async (req, res, next) => {
+  try {
+    await UserService.mustHaveAuthenticatedToDeleteParamId(req.authenticatedUser, req.params.id);
+    await UserService.deleteUser(req.params.id);
+    res.send();
   } catch (err) {
     next(err);
   }

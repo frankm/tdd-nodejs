@@ -3,9 +3,12 @@ const router = express.Router();
 const UserService = require('./UserService');
 const { check, validationResult } = require('express-validator');
 const pagination = require('../middleware/pagination');
+const NotFoundException = require('../error/NotFoundException');
+const ValidationException = require('../error/ValidationException');
 
 const usersUrl = '/api/1.0/users';
 const tokenUrl = usersUrl + '/token/';
+const passwordResetUrl = '/api/1.0/password-reset';
 
 router.post(
   usersUrl,
@@ -84,6 +87,15 @@ router.delete(usersUrl + '/:id', async (req, res, next) => {
     await UserService.mustHaveAuthenticatedToDeleteParamId(req.authenticatedUser, req.params.id);
     await UserService.deleteUser(req.params.id);
     res.send();
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post(passwordResetUrl, check('email').isEmail().withMessage('email_invalid'), async (req, res, next) => {
+  try {
+    await UserService.mustHaveNoErrors(validationResult(req));
+    throw new NotFoundException('email_not_inuse');
   } catch (err) {
     next(err);
   }

@@ -110,6 +110,15 @@ const mustHaveAuthenticatedToDeleteParamId = async (authenticatedUser, id) => {
   }
 };
 
+const passwordResetRequest = async (email) => {
+  const user = await findByEmail(email);
+  if (!user) {
+    throw new NotFoundException('email_not_inuse');
+  }
+  user.passwordResetToken = randomString(16);
+  user.save();
+};
+
 module.exports = {
   save,
   findByEmail,
@@ -122,4 +131,5 @@ module.exports = {
   deleteUser,
   mustHaveAuthenticatedToUpdateParamId,
   mustHaveAuthenticatedToDeleteParamId,
+  passwordResetRequest,
 };

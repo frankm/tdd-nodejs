@@ -19,6 +19,8 @@ beforeEach(async () => {
 const usersUrl = '/api/1.0/users';
 const authenticationUrl = '/api/1.0/auth';
 const logoutUrl = '/api/1.0/logout';
+const DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
+
 const activeUser = {
   username: 'user1',
   email: 'user1@mail.com',
@@ -169,7 +171,7 @@ describe('Token Expiration', () => {
   it('returns 403, when token is older than 1 week', async () => {
     const savedUser = await addUser();
     const token = 'test-token';
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const oneWeekAgo = new Date(Date.now() - 7 * DAY_IN_MILLIS);
     await Token.create({
       token: token,
       userId: savedUser.id,
@@ -183,7 +185,7 @@ describe('Token Expiration', () => {
   it('refreshes lastUsedAt, when unexpired token is used', async () => {
     const savedUser = await addUser();
     const token = 'test-token';
-    const fourDaysAgo = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000);
+    const fourDaysAgo = new Date(Date.now() - 4 * DAY_IN_MILLIS);
     await Token.create({
       token: token,
       userId: savedUser.id,
@@ -199,7 +201,7 @@ describe('Token Expiration', () => {
   it('refreshes lastUsedAt, when unexpired token accesses unauthenticated endpoint', async () => {
     const savedUser = await addUser();
     const token = 'test-token';
-    const fourDaysAgo = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000);
+    const fourDaysAgo = new Date(Date.now() - 4 * DAY_IN_MILLIS);
     await Token.create({
       token: token,
       userId: savedUser.id,

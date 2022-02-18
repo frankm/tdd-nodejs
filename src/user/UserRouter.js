@@ -72,7 +72,7 @@ router.get(usersUrl + '/:id', async (req, res, next) => {
 
 router.put(usersUrl + '/:id', async (req, res, next) => {
   try {
-    await UserService.mustHaveAuthenticatedToUpdateParamId(req.authenticatedUser, req.params.id);
+    await UserService.mustAuthenticateToUpdateById(req.authenticatedUser, req.params.id);
     await UserService.updateUser(req.params.id, req.body);
     return res.send();
   } catch (err) {
@@ -82,7 +82,7 @@ router.put(usersUrl + '/:id', async (req, res, next) => {
 
 router.delete(usersUrl + '/:id', async (req, res, next) => {
   try {
-    await UserService.mustHaveAuthenticatedToDeleteParamId(req.authenticatedUser, req.params.id);
+    await UserService.mustAuthenticateToDeleteById(req.authenticatedUser, req.params.id);
     await UserService.deleteUser(req.params.id);
     res.send();
   } catch (err) {
@@ -99,5 +99,35 @@ router.post(passwordResetUrl, check('email').isEmail().withMessage('email_invali
     next(err);
   }
 });
+
+const passwordResetTokenValidator = async (req, res, next) => {
+  const user = await UserService.findByPasswordResetToken(req.body.passwordResetToken);
+  if (!user) {
+    return next(UserService.mustAuthenticateToResetPassword());
+  }
+  next();
+};
+
+router.put(
+  passwordResetUrl,
+  passwordResetTokenValidator,
+  check('password')
+    .notEmpty()
+    .withMessage('password_null')
+    .bail()
+    .isLength({ min: 6 })
+    .withMessage('password_size')
+    .bail()
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/)
+    .withMessage('password_pattern'),
+  async (req, res, next) => {
+    try {
+      await UserService.mustHaveNoErrors(validationResult(req));
+      return res.status(400).send();
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 module.exports = router;

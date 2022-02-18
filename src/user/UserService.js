@@ -30,6 +30,10 @@ const findByEmail = async (email) => {
   return await User.findOne({ where: { email: email } });
 };
 
+const findByPasswordResetToken = async (token) => {
+  return await User.findOne({ where: { passwordResetToken: token } });
+};
+
 const mustHaveUniqueEmail = async (email) => {
   const user = await findByEmail(email);
   if (user) {
@@ -97,13 +101,13 @@ const deleteUser = async (id) => {
   await User.destroy({ where: { id: id } });
 };
 
-const mustHaveAuthenticatedToUpdateParamId = async (authenticatedUser, id) => {
+const mustAuthenticateToUpdateById = async (authenticatedUser, id) => {
   // eslint-disable-next-line eqeqeq
   if (!authenticatedUser || authenticatedUser.id != id) {
     throw new ForbiddenException('unauthorized_user_update');
   }
 };
-const mustHaveAuthenticatedToDeleteParamId = async (authenticatedUser, id) => {
+const mustAuthenticateToDeleteById = async (authenticatedUser, id) => {
   // eslint-disable-next-line eqeqeq
   if (!authenticatedUser || authenticatedUser.id != id) {
     throw new ForbiddenException('unauthorized_user_delete');
@@ -124,9 +128,14 @@ const passwordResetRequest = async (email) => {
   }
 };
 
+const mustAuthenticateToResetPassword = () => {
+  return new ForbiddenException('unauthorized_password_reset');
+};
+
 module.exports = {
   save,
   findByEmail,
+  findByPasswordResetToken,
   activate,
   mustHaveUniqueEmail,
   mustHaveNoErrors,
@@ -134,7 +143,8 @@ module.exports = {
   getUser,
   updateUser,
   deleteUser,
-  mustHaveAuthenticatedToUpdateParamId,
-  mustHaveAuthenticatedToDeleteParamId,
+  mustAuthenticateToUpdateById,
+  mustAuthenticateToDeleteById,
   passwordResetRequest,
+  mustAuthenticateToResetPassword,
 };

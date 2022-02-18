@@ -28,7 +28,7 @@ if (process.env.NODE_ENV === 'development') {
 if (process.env.NODE_ENV === 'test') {
   mail = {
     host: get('MAIL_HOST').asString(),
-    port: get('MAIL_PORT').asPortNumber(),
+    port: Math.floor(Math.random() * 2000) + 10000,
     tls: {
       rejectUnauthorized: get('REJECT_UNAUTHORIZED').asBoolStrict(),
     },

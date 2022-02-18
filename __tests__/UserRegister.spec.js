@@ -5,6 +5,7 @@ const sequelize = require('../src/config/db');
 const SMTPServer = require('smtp-server').SMTPServer;
 const en = require('../locales/en/translation.json');
 const tr = require('../locales/tr/translation.json');
+const appConfig = require('../src/config/config');
 
 let lastMail, server;
 let simulateSmtpFailure = false;
@@ -29,7 +30,7 @@ beforeAll(async () => {
     },
   });
 
-  await server.listen(8587, 'localhost');
+  await server.listen(appConfig.mail.port, 'localhost');
 
   await sequelize.sync();
 });

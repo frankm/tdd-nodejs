@@ -116,7 +116,12 @@ const passwordResetRequest = async (email) => {
     throw new NotFoundException('email_not_inuse');
   }
   user.passwordResetToken = randomString(16);
-  user.save();
+  await user.save();
+  try {
+    await EmailService.sendPasswordReset(email, user.passwordResetToken);
+  } catch (err) {
+    throw new EmailException();
+  }
 };
 
 module.exports = {

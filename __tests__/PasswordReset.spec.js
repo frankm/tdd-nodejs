@@ -11,6 +11,7 @@ const appConfig = require('../src/config/config');
 
 let lastMail, server;
 let simulateSmtpFailure = false;
+const passwordResetUrl = '/api/1.0/user/password';
 
 beforeAll(async () => {
   server = new SMTPServer({
@@ -47,8 +48,6 @@ afterAll(async () => {
   await server.close();
   jest.setTimeout(5000);
 });
-
-const passwordResetUrl = '/api/1.0/password-reset';
 
 const activeUser = {
   username: 'user1',

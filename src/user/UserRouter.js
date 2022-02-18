@@ -6,7 +6,7 @@ const pagination = require('../middleware/pagination');
 
 const usersUrl = '/api/1.0/users';
 const tokenUrl = usersUrl + '/token/';
-const passwordResetUrl = '/api/1.0/password-reset';
+const passwordResetUrl = '/api/1.0/user/password';
 
 router.post(
   usersUrl,

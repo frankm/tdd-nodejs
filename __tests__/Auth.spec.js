@@ -57,12 +57,12 @@ describe('Authentication', () => {
     expect(response.status).toBe(200);
   });
 
-  it('returns only user id, username, and token, when login success', async () => {
+  it('returns only user id, username, token, and image,  when login success', async () => {
     const user = await addUser();
     const response = await postAuthentication({ email: activeUser.email, password: activeUser.password });
     expect(response.body.id).toBe(user.id);
     expect(response.body.username).toBe(user.username);
-    expect(Object.keys(response.body)).toEqual(['id', 'username', 'token']);
+    expect(Object.keys(response.body).sort()).toEqual(['id', 'username', 'token', 'image'].sort());
   });
 
   it('returns 401, when user does not exist', async () => {

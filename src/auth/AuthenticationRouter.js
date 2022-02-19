@@ -21,6 +21,7 @@ router.post(authUrl, check('email').isEmail(), async (req, res, next) => {
       id: user.id,
       username: user.username,
       token,
+      image: user.image,
     });
   } catch (err) {
     next(err);

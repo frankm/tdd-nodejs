@@ -85,11 +85,11 @@ describe('Listing Users', () => {
     const response = await getUsers();
     expect(response.body.content.length).toBe(6);
   });
-  it('returns only id, username, and email in content array, for each user', async () => {
+  it('returns only id, username, email, and image in content array, for each user', async () => {
     await addUsers(11);
     const response = await getUsers();
     const user = response.body.content[0];
-    expect(Object.keys(user).sort()).toEqual(['id', 'username', 'email'].sort());
+    expect(Object.keys(user).sort()).toEqual(['id', 'username', 'email', 'image'].sort());
   });
   it('returns 2 totalPages, when 15 active and 7 inactive users', async () => {
     await addUsers(15, 7);
@@ -171,10 +171,10 @@ describe('Get User', () => {
     expect(response.status).toBe(200);
   });
 
-  it('returns only id, username, and email in response body, when active user exists', async () => {
+  it('returns only id, username, email, and image in response body, when active user exists', async () => {
     const activeUser = await createUser();
     const response = await getUser(activeUser.id);
-    expect(Object.keys(response.body)).toEqual(['id', 'username', 'email']);
+    expect(Object.keys(response.body).sort()).toEqual(['id', 'username', 'image', 'email'].sort());
   });
 
   it('returns 404, when user is inactive', async () => {

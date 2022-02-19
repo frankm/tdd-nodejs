@@ -73,8 +73,8 @@ router.get(usersUrl + '/:id', async (req, res, next) => {
 router.put(usersUrl + '/:id', async (req, res, next) => {
   try {
     await UserService.mustAuthenticateToUpdateById(req.authenticatedUser, req.params.id);
-    await UserService.updateUser(req.params.id, req.body);
-    return res.send();
+    const user = await UserService.updateUser(req.params.id, req.body);
+    return res.send(user);
   } catch (err) {
     next(err);
   }

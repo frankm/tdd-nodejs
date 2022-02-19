@@ -66,7 +66,7 @@ const getUsers = async (pageIndex, size, authenticatedUser) => {
         [Sequelize.Op.not]: authenticatedUser ? authenticatedUser.id : 0,
       },
     },
-    attributes: ['id', 'username', 'email'],
+    attributes: ['id', 'username', 'email', 'image'],
     limit: size,
     offset: pageIndex * size,
   });
@@ -84,7 +84,7 @@ const getUser = async (id) => {
       id: id,
       active: true,
     },
-    attributes: ['id', 'username', 'email'],
+    attributes: ['id', 'username', 'email', 'image'],
   });
   if (!user) {
     throw new NotFoundException('user_not_found');
@@ -97,6 +97,12 @@ const updateUser = async (id, updatedBody) => {
   user.username = updatedBody.username;
   user.image = updatedBody.image;
   await user.save();
+  return {
+    id: id,
+    username: user.username,
+    email: user.email,
+    image: user.image,
+  };
 };
 
 const deleteUser = async (id) => {

@@ -101,11 +101,12 @@ router.post(passwordResetUrl, check('email').isEmail().withMessage('email_invali
 });
 
 const passwordResetTokenValidator = async (req, res, next) => {
-  const user = await UserService.findByPasswordResetToken(req.body.passwordResetToken);
-  if (!user) {
-    return next(UserService.mustAuthenticateToResetPassword());
+  try {
+    await UserService.mustAuthenticateResetToken(req.body.passwordResetToken);
+    next();
+  } catch (err) {
+    next(err);
   }
-  next();
 };
 
 router.put(
@@ -123,7 +124,8 @@ router.put(
   async (req, res, next) => {
     try {
       await UserService.mustHaveNoErrors(validationResult(req));
-      return res.status(400).send();
+      await UserService.updatePassword(req.body);
+      return res.send();
     } catch (err) {
       next(err);
     }

@@ -10,6 +10,7 @@ const ValidationException = require('../error/ValidationException');
 const NotFoundException = require('../error/NotFoundException');
 const ForbiddenException = require('../error/ForbiddenException');
 const { randomString } = require('../shared/generator');
+const TokenService = require('../auth/TokenService');
 
 const save = async (body) => {
   const { username, email, password } = body;
@@ -128,8 +129,22 @@ const passwordResetRequest = async (email) => {
   }
 };
 
-const mustAuthenticateToResetPassword = () => {
-  return new ForbiddenException('unauthorized_password_reset');
+const mustAuthenticateResetToken = async (token) => {
+  const user = await findByPasswordResetToken(token);
+  if (!user) {
+    throw new ForbiddenException('unauthorized_password_reset');
+  }
+};
+
+const updatePassword = async (updateRequest) => {
+  const user = await findByPasswordResetToken(updateRequest.passwordResetToken);
+  const hash = await bcrypt.hash(updateRequest.password, saltRounds);
+  user.password = hash;
+  user.passwordResetToken = null;
+  user.activationToken = null;
+  user.active = true;
+  await user.save();
+  await TokenService.clearTokens(user.id);
 };
 
 module.exports = {
@@ -146,5 +161,6 @@ module.exports = {
   mustAuthenticateToUpdateById,
   mustAuthenticateToDeleteById,
   passwordResetRequest,
-  mustAuthenticateToResetPassword,
+  mustAuthenticateResetToken,
+  updatePassword,
 };

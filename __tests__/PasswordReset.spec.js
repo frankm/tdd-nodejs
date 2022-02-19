@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../src/app');
 const User = require('../src/user/User');
+const Token = require('../src/auth/Token');
 const sequelize = require('../src/config/db');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -11,6 +12,7 @@ const appConfig = require('../src/config/config');
 
 let lastMail, server;
 let simulateSmtpFailure = false;
+const DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
 const passwordResetUrl = '/api/1.0/user/password';
 
 beforeAll(async () => {
@@ -252,4 +254,78 @@ describe('Password Update', () => {
       expect(response.body.validationErrors.password).toBe(message);
     }
   );
+
+  it('returns 200, when valid password & valid token', async () => {
+    const user = await addUser();
+    user.passwordResetToken = 'valid-Tok3n';
+    await user.save();
+    const response = await putPasswordUpdate({
+      password: 'N3w-password',
+      passwordResetToken: user.passwordResetToken,
+    });
+    expect(response.status).toBe(200);
+  });
+
+  it('returns 200, when valid password & valid token', async () => {
+    const user = await addUser();
+    user.passwordResetToken = 'valid-Tok3n';
+    await user.save();
+    await putPasswordUpdate({
+      password: 'N3w-password',
+      passwordResetToken: user.passwordResetToken,
+    });
+    const userInDB = await User.findOne({ where: { email: user.email } });
+    expect(userInDB.password).not.toEqual(user.password);
+  });
+
+  it('clears reset token, when valid request', async () => {
+    const user = await addUser();
+    user.passwordResetToken = 'valid-Tok3n';
+    await user.save();
+    await putPasswordUpdate({
+      password: 'N3w-password',
+      passwordResetToken: user.passwordResetToken,
+    });
+    const userInDB = await User.findOne({ where: { email: user.email } });
+    expect(userInDB.passwordResetToken).toBeFalsy();
+  });
+
+  it('clears & resets activation token, when account inactive & valid password reset', async () => {
+    const user = await addUser();
+    user.passwordResetToken = 'valid-Tok3n';
+    user.activationToken = 'activation-token';
+    user.active = false;
+    await user.save();
+    await putPasswordUpdate({
+      password: 'N3w-password',
+      passwordResetToken: user.passwordResetToken,
+    });
+    const userInDB = await User.findOne({ where: { email: user.email } });
+    expect(userInDB.activationToken).toBeFalsy();
+    expect(userInDB.active).toBe(true);
+  });
+
+  it('clears all tokens of user, when valid password reset', async () => {
+    const user = await addUser();
+    user.passwordResetToken = 'valid-Tok3n';
+    await user.save();
+    await Token.create({
+      token: 'token-1',
+      userId: user.id,
+      lastUsedAt: Date.now(),
+    });
+
+    const threeDaysAgo = new Date(Date.now() - 3 * DAY_IN_MILLIS);
+    await Token.create({
+      token: 'token-2',
+      userId: user.id,
+      lastUsedAt: threeDaysAgo,
+    });
+    await putPasswordUpdate({
+      password: 'N3w-password',
+      passwordResetToken: user.passwordResetToken,
+    });
+    const tokens = await Token.findAll({ where: { userId: user.id } });
+    expect((await tokens).length).toBe(0);
+  });
 });

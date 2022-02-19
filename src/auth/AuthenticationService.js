@@ -8,7 +8,7 @@ const mustHaveNoErrors = async (errors) => {
   }
 };
 
-const mustHaveAuthenticatedActiveUser = async (user, password) => {
+const mustAuthenticateActiveUser = async (user, password) => {
   if (!user) {
     throw new AuthenticationException();
   }
@@ -23,4 +23,4 @@ const mustHaveAuthenticatedActiveUser = async (user, password) => {
   }
 };
 
-module.exports = { mustHaveNoErrors, mustHaveAuthenticatedActiveUser };
+module.exports = { mustHaveNoErrors, mustAuthenticateActiveUser };

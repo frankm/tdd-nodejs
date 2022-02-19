@@ -15,7 +15,7 @@ router.post(authUrl, check('email').isEmail(), async (req, res, next) => {
     await AuthenticationService.mustHaveNoErrors(errors);
     const { email, password } = req.body;
     const user = await UserService.findByEmail(email);
-    await AuthenticationService.mustHaveAuthenticatedActiveUser(user, password);
+    await AuthenticationService.mustAuthenticateActiveUser(user, password);
     const token = await TokenService.createToken(user);
     res.send({
       id: user.id,

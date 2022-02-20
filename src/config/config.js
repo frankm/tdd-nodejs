@@ -45,6 +45,10 @@ const appConfig = {
     logging: get('DB_LOGGING').default('false').asBoolStrict(),
   },
   mail: { ...mail },
+  folders: {
+    uploadDir: get('UPLOAD_DIR').asString(),
+    profileDir: get('PROFILE_DIR').asString(),
+  },
 };
 
 module.exports = appConfig;

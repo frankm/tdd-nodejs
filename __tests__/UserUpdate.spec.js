@@ -21,13 +21,6 @@ beforeEach(async () => {
   await User.destroy({ truncate: { cascade: true } });
 });
 
-afterAll(() => {
-  const files = fs.readdirSync(profileDirectory);
-  for (const file of files) {
-    fs.unlinkSync(path.join(profileDirectory, file));
-  }
-});
-
 const usersUrl = '/api/1.0/users';
 const authUrl = '/api/1.0/auth';
 

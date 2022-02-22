@@ -70,15 +70,25 @@ router.get(usersUrl + '/:id', async (req, res, next) => {
   }
 });
 
-router.put(usersUrl + '/:id', async (req, res, next) => {
-  try {
-    await UserService.mustAuthenticateToUpdateById(req.authenticatedUser, req.params.id);
-    const user = await UserService.updateUser(req.params.id, req.body);
-    return res.send(user);
-  } catch (err) {
-    next(err);
+router.put(
+  usersUrl + '/:id',
+  check('username')
+    .notEmpty()
+    .withMessage('username_null')
+    .bail()
+    .isLength({ min: 4, max: 32 })
+    .withMessage('username_size'),
+  async (req, res, next) => {
+    try {
+      await UserService.mustAuthenticateToUpdateById(req.authenticatedUser, req.params.id);
+      await UserService.mustHaveNoErrors(validationResult(req));
+      const user = await UserService.updateUser(req.params.id, req.body);
+      return res.send(user);
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 router.delete(usersUrl + '/:id', async (req, res, next) => {
   try {

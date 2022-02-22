@@ -78,6 +78,10 @@ router.put(
     .bail()
     .isLength({ min: 4, max: 32 })
     .withMessage('username_size'),
+  check('image').custom((imageAsBase64String) => {
+    UserService.mustNotExceedSizeLimit(imageAsBase64String, 2 * 1024 * 1024);
+    return true;
+  }),
   async (req, res, next) => {
     try {
       await UserService.mustAuthenticateToUpdateById(req.authenticatedUser, req.params.id);

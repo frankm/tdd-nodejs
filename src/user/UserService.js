@@ -96,8 +96,10 @@ const getUser = async (id) => {
 const updateUser = async (id, updatedBody) => {
   const user = await User.findOne({ where: { id: id } });
   user.username = updatedBody.username;
-  if (user.image) {
-    await FileService.deleteProfileImage(user.image);
+  if (updatedBody.image) {
+    if (user.image) {
+      await FileService.deleteProfileImage(user.image);
+    }
   }
   if (updatedBody.image) {
     user.image = await FileService.saveProfileImage(updatedBody.image);
@@ -160,6 +162,16 @@ const updatePassword = async (updateRequest) => {
   await TokenService.clearTokens(user.id);
 };
 
+const mustNotExceedSizeLimit = (imageAsBase64String, imageSize) => {
+  if (!imageAsBase64String) {
+    return true;
+  }
+  const buffer = Buffer.from(imageAsBase64String, 'base64');
+  if (buffer.length > imageSize) {
+    throw new Error('profile_image_size');
+  }
+};
+
 module.exports = {
   save,
   findByEmail,
@@ -176,4 +188,5 @@ module.exports = {
   passwordResetRequest,
   mustAuthenticateResetToken,
   updatePassword,
+  mustNotExceedSizeLimit,
 };

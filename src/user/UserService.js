@@ -162,16 +162,6 @@ const updatePassword = async (updateRequest) => {
   await TokenService.clearTokens(user.id);
 };
 
-const mustNotExceedSizeLimit = (imageAsBase64String, imageSize) => {
-  if (!imageAsBase64String) {
-    return true;
-  }
-  const buffer = Buffer.from(imageAsBase64String, 'base64');
-  if (buffer.length > imageSize) {
-    throw new Error('profile_image_size');
-  }
-};
-
 module.exports = {
   save,
   findByEmail,
@@ -188,5 +178,4 @@ module.exports = {
   passwordResetRequest,
   mustAuthenticateResetToken,
   updatePassword,
-  mustNotExceedSizeLimit,
 };

@@ -3,10 +3,12 @@ const router = express.Router();
 const UserService = require('./UserService');
 const { check, validationResult } = require('express-validator');
 const pagination = require('../middleware/pagination');
+const FileService = require('../file/FileService');
 
 const usersUrl = '/api/1.0/users';
 const tokenUrl = usersUrl + '/token/';
 const passwordResetUrl = '/api/1.0/user/password';
+const IMAGE_SIZE_LIMIT = 2 * 1024 * 1024;
 
 router.post(
   usersUrl,
@@ -78,8 +80,12 @@ router.put(
     .bail()
     .isLength({ min: 4, max: 32 })
     .withMessage('username_size'),
-  check('image').custom((imageAsBase64String) => {
-    UserService.mustNotExceedSizeLimit(imageAsBase64String, 2 * 1024 * 1024);
+  check('image').custom(async (imageAsBase64String) => {
+    if (imageAsBase64String) {
+      const imageBuffer = Buffer.from(imageAsBase64String, 'base64');
+      FileService.mustNotExceedSizeLimit(imageBuffer, IMAGE_SIZE_LIMIT);
+      await FileService.mustBeSupportedImageType(imageBuffer);
+    }
     return true;
   }),
   async (req, res, next) => {

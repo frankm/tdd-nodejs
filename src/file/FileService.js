@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const appConfig = require('../config/config');
 const { randomString } = require('../shared/generator');
+const FileType = require('file-type');
 
 const { uploadDir, profileDir } = appConfig.folders;
 const profileFolder = path.join('.', uploadDir, profileDir);
@@ -28,4 +29,23 @@ const deleteProfileImage = async (filename) => {
   await fs.promises.unlink(filePath);
 };
 
-module.exports = { createFolders, saveProfileImage, deleteProfileImage };
+const mustNotExceedSizeLimit = (imageBuffer, imageSize) => {
+  if (imageBuffer.length > imageSize) {
+    throw new Error('profile_image_size');
+  }
+};
+
+const mustBeSupportedImageType = async (imageBuffer) => {
+  const type = await FileType.fromBuffer(imageBuffer);
+  if (!type || (type.mime !== 'image/png' && type.mime !== 'image/jpeg')) {
+    throw new Error('unsupported_image_file');
+  }
+};
+
+module.exports = {
+  createFolders,
+  saveProfileImage,
+  deleteProfileImage,
+  mustNotExceedSizeLimit,
+  mustBeSupportedImageType,
+};

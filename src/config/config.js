@@ -40,6 +40,7 @@ const appConfig = {
     name: get('DATABASE').asString(),
     username: get('DB_USERNAME').asString(),
     password: get('DB_PASSWORD').asString(),
+    host: get('DB_HOST').asString(),
     dialect: get('DB_DIALECT').asString(),
     storage: get('DB_STORAGE').asString(),
     logging: get('DB_LOGGING').default('false').asBoolStrict(),

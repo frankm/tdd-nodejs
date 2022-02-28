@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === 'development') {
   };
 }
 
-if (process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'staging') {
   mail = {
     host: get('MAIL_HOST').asString(),
     port: Math.floor(Math.random() * 2000) + 10000,

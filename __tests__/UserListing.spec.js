@@ -12,7 +12,9 @@ const usersUrl = '/api/1.0/users';
 const authUrl = '/api/1.0/auth';
 
 beforeAll(async () => {
-  await sequelize.sync();
+  if (process.env.NODE_ENV === 'test') {
+    await sequelize.sync();
+  }
 });
 
 beforeEach(async () => {

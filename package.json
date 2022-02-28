@@ -8,7 +8,7 @@
     "test": "NODE_ENV=test jest --watch",
     "posttest": "NODE_ENV=test node test-cleanup",
     "lint": "eslint .",
-    "test:staging":  "NODE_ENV=staging jest -f .  --runInBand",
+    "test:staging":  "NODE_ENV=staging jest -f --all --runInBand",
     "migrate:test": "NODE_ENV=staging sequelize-cli db:migrate",
     "pretest:staging": "npm run migrate:test",
     "posttest:staging": "NODE_ENV=staging node test-cleanup"
@@ -70,6 +70,10 @@
     "watchPlugins": [
       "jest-watch-typeahead/filename",
       "jest-watch-typeahead/testname"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/envs/"
     ]
   }
 }

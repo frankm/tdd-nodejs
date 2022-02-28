@@ -13,26 +13,28 @@ if (process.env.NODE_ENV === 'development') {
 dotenv.config({ path: priority });
 dotenv.config({ path: shared });
 
-let mail;
-if (process.env.NODE_ENV === 'development') {
-  mail = {
-    host: get('MAIL_HOST').asString(),
-    port: get('MAIL_PORT').asPortNumber(),
-    auth: {
-      user: get('MAIL_USER').asString(),
-      pass: get('MAIL_PASS').asString(),
-    },
-  };
-}
+const authMail = {
+  host: get('MAIL_HOST').asString(),
+  port: get('MAIL_PORT').asPortNumber(),
+  auth: {
+    user: get('MAIL_USER').asString(),
+    pass: get('MAIL_PASS').asString(),
+  },
+};
 
-if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'staging') {
-  mail = {
-    host: get('MAIL_HOST').asString(),
-    port: Math.floor(Math.random() * 2000) + 10000,
-    tls: {
-      rejectUnauthorized: get('REJECT_UNAUTHORIZED').asBoolStrict(),
-    },
-  };
+const ignoreCertMail = {
+  host: get('MAIL_HOST').asString(),
+  port: Math.floor(Math.random() * 2000) + 10000,
+  tls: {
+    rejectUnauthorized: get('REJECT_UNAUTHORIZED').asBoolStrict(),
+  },
+};
+
+let mail;
+if (authMail.auth.user) {
+  mail = authMail;
+} else {
+  mail = ignoreCertMail;
 }
 
 const appConfig = {
@@ -45,7 +47,7 @@ const appConfig = {
     storage: get('DB_STORAGE').asString(),
     logging: get('DB_LOGGING').default('false').asBoolStrict(),
   },
-  mail: { ...mail },
+  mail,
   folders: {
     uploadDir: get('UPLOAD_DIR').asString(),
     profileDir: get('PROFILE_DIR').asString(),

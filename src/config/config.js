@@ -39,7 +39,7 @@ if (authMail.auth.user) {
 
 const appConfig = {
   db: {
-    name: get('DATABASE').asString(),
+    database: get('DATABASE').asString(),
     username: get('DB_USERNAME').asString(),
     password: get('DB_PASSWORD').asString(),
     host: get('DB_HOST').asString(),

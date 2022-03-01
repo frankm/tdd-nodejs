@@ -4,14 +4,13 @@
   "description": "tdd with express",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_ENV=development node index",
-    "test": "NODE_ENV=test jest --watch",
-    "posttest": "NODE_ENV=test node test-cleanup",
+    "start:dev": "NODE_ENV=development npm run migrate && NODE_ENV=development nodemon index",
+    "start": "NODE_ENV=production npm run migrate && NODE_ENV=production node index",
+    "test": "NODE_ENV=test jest --watch && NODE_ENV=test npm run clean-up",
+    "test:staging": "NODE_ENV=staging npm run migrate && NODE_ENV=staging jest -f --all --runInBand --forceExit && NODE_ENV=staging npm run clean-up",
+    "clean-up": "node test-cleanup",
     "lint": "eslint .",
-    "test:staging": "NODE_ENV=staging jest -f --all --runInBand --forceExit",
-    "migrate:test": "NODE_ENV=staging sequelize-cli db:migrate",
-    "pretest:staging": "npm run migrate:test",
-    "posttest:staging": "NODE_ENV=staging node test-cleanup"
+    "migrate": "sequelize-cli db:migrate"
   },
   "author": "Frank M",
   "license": "ISC",

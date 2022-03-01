@@ -79,13 +79,10 @@ describe('User Delete', () => {
     const userToBeDeleted = await addUser({ ...activeUser, username: 'user2', email: 'user2@mail.com' });
     const token = auth({ auth: { email: 'user1@mail.com', password: 'P4ssword' } });
     const response = await deleteUser(userToBeDeleted.id, { token: token });
-    console.log('response.status =', response.status);
     expect(response.status).toBe(403);
   });
   it('returns 403, when token is not valid', async () => {
     const response = await deleteUser(5, { token: '123' });
-    console.log('response.status =', response.status);
-
     expect(response.status).toBe(403);
   });
   it('returns 200 ok, when delete request from authorized user', async () => {

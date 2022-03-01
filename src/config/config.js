@@ -1,12 +1,13 @@
 const dotenv = require('dotenv');
 const { get } = require('env-var');
+const logger = require('../shared/logger');
 
 const priority = `.env.${process.env.NODE_ENV}.local`;
 const shared = `.env.${process.env.NODE_ENV}`;
 
 if (process.env.NODE_ENV === 'development') {
-  console.log(`shared file = ${shared}`);
-  console.log(`priority file = ${priority}\n`);
+  logger.info(`shared file = ${shared}`);
+  logger.info(`priority file = ${priority}\n`);
 }
 
 // priority is read first

@@ -37,7 +37,7 @@ const sendPasswordReset = async (email, token) => {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    console.log('url: ' + nodemailer.getTestMessageUrl(info));
+    logger.info('url: ' + nodemailer.getTestMessageUrl(info));
   }
 };
 module.exports = { sendAccountActivation, sendPasswordReset };

@@ -209,7 +209,7 @@ describe('User Registration', () => {
   it('returns Validation Failure message when validation fails', async () => {
     const invalidUser = { ...validUser, username: null };
     const response = await postUser(invalidUser);
-    expect(response.body.message).toBe('Validation Failure');
+    expect(response.body.message).toBe(en.validation_failure);
   });
 });
 

@@ -77,7 +77,7 @@ describe('User Delete', () => {
   it('returns forbidden, when delete request with correct credentials for different user', async () => {
     await addUser();
     const userToBeDeleted = await addUser({ ...activeUser, username: 'user2', email: 'user2@mail.com' });
-    const token = auth({ auth: { email: 'user1@mail.com', password: 'P4ssword' } });
+    const token = await auth({ auth: { email: 'user1@mail.com', password: 'P4ssword' } });
     const response = await deleteUser(userToBeDeleted.id, { token: token });
     expect(response.status).toBe(403);
   });

@@ -4,11 +4,12 @@
   "description": "tdd with express",
   "main": "app.js",
   "scripts": {
-    "start:dev": "NODE_ENV=development npm run migrate && NODE_ENV=development nodemon index",
-    "start": "NODE_ENV=production npm run migrate && NODE_ENV=production node index",
+    "start:dev": "NODE_ENV=development npm run migrate && NODE_ENV=development npm run smoke-tests && NODE_ENV=development nodemon index",
+    "start": "NODE_ENV=production npm run migrate && NODE_ENV=production npm run smoke-tests && NODE_ENV=production node index",
     "test": "NODE_ENV=test jest --watch && NODE_ENV=test npm run clean-up",
-    "test:staging": "NODE_ENV=staging npm run migrate && NODE_ENV=staging jest -f --all --runInBand --forceExit && NODE_ENV=staging npm run clean-up",
+    "test:staging": "NODE_ENV=staging npm run migrate && NODE_ENV=staging npm run smoke-tests && NODE_ENV=staging jest -f --all --runInBand --forceExit && NODE_ENV=staging npm run clean-up",
     "clean-up": "node test-cleanup",
+    "smoke-tests": "node __smoke_tests__",
     "lint": "eslint .",
     "migrate": "sequelize-cli db:migrate"
   },

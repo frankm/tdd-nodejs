@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const appConfig = require('../config/config');
+const appConfig = require('../config/configFactory');
 const { randomString } = require('../shared/generator');
 const FileType = require('file-type');
 

@@ -22,21 +22,14 @@ const authMail = {
     pass: get('MAIL_PASS').asString(),
   },
 };
-
+const randomPort = Math.floor(Math.random() * 2000) + 10000;
 const ignoreCertMail = {
   host: get('MAIL_HOST').asString(),
-  port: Math.floor(Math.random() * 2000) + 10000,
+  port: get('MAIL_PORT').default(randomPort).asPortNumber(),
   tls: {
     rejectUnauthorized: get('REJECT_UNAUTHORIZED').asBoolStrict(),
   },
 };
-
-let mail;
-if (authMail.auth.user) {
-  mail = authMail;
-} else {
-  mail = ignoreCertMail;
-}
 
 const appConfig = {
   db: {
@@ -48,7 +41,8 @@ const appConfig = {
     storage: get('DB_STORAGE').asString(),
     logging: get('DB_LOGGING').default('false').asBoolStrict(),
   },
-  mail,
+  authMail,
+  ignoreCertMail,
   folders: {
     uploadDir: get('UPLOAD_DIR').asString(),
     profileDir: get('PROFILE_DIR').asString(),

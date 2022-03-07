@@ -1,4 +1,4 @@
-const sequelize = require('../src/config/db');
+const sequelize = require('../src/config/dbinstance');
 const Token = require('../src/auth/Token');
 const TokenService = require('../src/auth/TokenService');
 

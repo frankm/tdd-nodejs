@@ -7,7 +7,7 @@ const middleware = require('i18next-http-middleware');
 const errorHandler = require('./error/ErrorHandler');
 const tokenAuthentication = require('./middleware/tokenAuthentication');
 const FileService = require('./file/FileService');
-const appConfig = require('./config/config');
+const appConfig = require('./config/configFactory');
 const path = require('path');
 
 const { uploadDir, profileDir } = appConfig.folders;

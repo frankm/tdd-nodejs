@@ -1,8 +1,8 @@
 const nodemailer = require('nodemailer');
-const appConfig = require('./config');
+const envs = require('../../envs');
 
-const mailConfig = appConfig.mail;
-
+const env = envs[process.env.NODE_ENV];
+const mailConfig = env.mail;
 const transporter = nodemailer.createTransport({ ...mailConfig });
 
 module.exports = transporter;

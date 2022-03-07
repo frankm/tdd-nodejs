@@ -1,7 +1,9 @@
-const appConfig = require('../src/config/config');
+const appConfig = require('../src/config/configfactory');
+
+const mail = appConfig.authMail;
 
 module.exports = {
   database: appConfig.db,
-  mail: appConfig.mail,
+  mail: mail,
   folders: appConfig.folders,
 };

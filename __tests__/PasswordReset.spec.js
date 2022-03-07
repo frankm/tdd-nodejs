@@ -2,13 +2,13 @@ const request = require('supertest');
 const app = require('../src/app');
 const User = require('../src/user/User');
 const Token = require('../src/auth/Token');
-const sequelize = require('../src/config/db');
+const sequelize = require('../src/config/dbinstance');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const en = require('../locales/en/translation.json');
 const tr = require('../locales/tr/translation.json');
 const SMTPServer = require('smtp-server').SMTPServer;
-const appConfig = require('../src/config/config');
+const envs = require('../envs');
 
 let lastMail, server;
 let simulateSmtpFailure = false;
@@ -35,7 +35,8 @@ beforeAll(async () => {
     },
   });
 
-  await server.listen(appConfig.mail.port, 'localhost');
+  const port = envs[process.env.NODE_ENV].mail;
+  await server.listen(port, 'localhost');
 
   if (process.env.NODE_ENV === 'test') {
     await sequelize.sync();

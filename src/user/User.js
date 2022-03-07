@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require('../config/db');
+const sequelize = require('../config/dbinstance');
 const Token = require('../auth/Token');
 
 const Model = Sequelize.Model;

@@ -3,8 +3,9 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const EmailService = require('../email/EmailService');
 const Sequelize = require('sequelize');
-const sequelize = require('../config/db');
+const sequelize = require('../config/dbinstance');
 const EmailException = require('../email/EmailException');
+const AuthenticationRequiredException = require('../error/AuthenticationRequiredException');
 const InvalidTokenException = require('./InvalidTokenException');
 const ValidationException = require('../error/ValidationException');
 const NotFoundException = require('../error/NotFoundException');
@@ -25,6 +26,14 @@ const save = async (body) => {
   } catch (err) {
     await transaction.rollback();
     throw new EmailException();
+  }
+};
+
+const sendTestMail = async (mail) => {
+  try {
+    await EmailService.sendSMTPConnectivity(mail);
+  } catch (err) {
+    throw new AuthenticationRequiredException('smtp_authentication_required');
   }
 };
 
@@ -178,4 +187,5 @@ module.exports = {
   passwordResetRequest,
   mustAuthenticateResetToken,
   updatePassword,
+  sendTestMail,
 };

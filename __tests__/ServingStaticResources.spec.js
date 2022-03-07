@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../src/app');
 const fs = require('fs');
 const path = require('path');
-const appConfig = require('../src/config/config');
+const appConfig = require('../src/config/configfactory');
 
 const { uploadDir, profileDir } = appConfig.folders;
 const profileDirectory = path.join('.', uploadDir, profileDir);

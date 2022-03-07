@@ -1,14 +1,14 @@
 const request = require('supertest');
 const app = require('../src/app');
 const User = require('../src/user/User');
-const sequelize = require('../src/config/db');
+const sequelize = require('../src/config/dbinstance');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const en = require('../locales/en/translation.json');
 const tr = require('../locales/tr/translation.json');
 const fs = require('fs');
 const path = require('path');
-const appConfig = require('../src/config/config');
+const appConfig = require('../src/config/configFactory');
 
 const { uploadDir, profileDir } = appConfig.folders;
 const profileDirectory = path.join('.', uploadDir, profileDir);

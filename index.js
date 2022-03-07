@@ -7,4 +7,5 @@ sequelize.sync();
 
 TokenService.scheduleCleanup();
 
-app.listen(3000, () => logger.info('app is running. version: ' + process.env.npm_package_version));
+const port = parseInt(process.env.PORT) || 3000;
+app.listen(port, () => logger.info('app is running on port:' + port + '. verson: ' + process.env.npm_package_version));

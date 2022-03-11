@@ -3,20 +3,21 @@ const SmokeTest = require('./SmokeTestService');
 
 // API
 const nodeEnv = process.env.NODE_ENV;
+console.log('smoke env =', nodeEnv);
 if (!nodeEnv) {
   throw new Error('NODE_ENV is not set');
 }
 
 // DB
 const env = envs[nodeEnv];
-SmokeTest.configSqliteWithAuthentication(env.database);
+SmokeTest.mustConfigSqliteWithAuthentication(env.database);
 
 // EMAIL SERVICES
 if (env.mail.auth) {
-  SmokeTest.configSMTPWithAuthentication(env.mail);
+  SmokeTest.mustConfigSMTPWithAuthentication(env.mail);
 } else {
-  SmokeTest.configSMTPWithNoAuth(env.mail);
+  SmokeTest.mustConfigSMTPWithNoAuth(env.mail);
 }
 
 // FILE SERVICES
-SmokeTest.configFolders(env.folders);
+SmokeTest.mustConfigFolders(env.folders);

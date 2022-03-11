@@ -1,11 +1,11 @@
 const AuthenticationRequiredException = require('../src/error/AuthenticationRequiredException');
 
-const configSMTPWithAuthentication = (mail) => {
+const mustConfigSMTPWithAuthentication = (mail) => {
   configSMTP(mail);
   configSMTPSecrets(mail);
 };
 
-const configSMTPWithNoAuth = (mail) => {
+const mustConfigSMTPWithNoAuth = (mail) => {
   configSMTP(mail);
   configSMTPSSL(mail);
 };
@@ -40,20 +40,20 @@ const configSqlite = (db) => {
   }
 };
 
-const configSqliteWithAuthentication = (db) => {
+const mustConfigSqliteWithAuthentication = (db) => {
   configDbSecrets(db);
   configSqlite(db);
 };
 
-const configFolders = (folders) => {
+const mustConfigFolders = (folders) => {
   if (!folders.uploadDir || !folders.profileDir) {
     throw new AuthenticationRequiredException('smtp_authentication_required');
   }
 };
 
 module.exports = {
-  configSMTPWithAuthentication,
-  configSMTPWithNoAuth,
-  configSqliteWithAuthentication,
-  configFolders,
+  mustConfigSMTPWithAuthentication,
+  mustConfigSMTPWithNoAuth,
+  mustConfigSqliteWithAuthentication,
+  mustConfigFolders,
 };

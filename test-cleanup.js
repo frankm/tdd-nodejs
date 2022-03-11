@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const appConfig = require('./src/config/configfactory');
+const appConfig = require('./src/config/configFactory.js');
 const logger = require('./src/shared/logger');
 
 const { uploadDir, profileDir } = appConfig.folders;

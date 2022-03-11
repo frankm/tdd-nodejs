@@ -1,6 +1,6 @@
 const User = require('../src/user/User');
 const UserService = require('../src/user/UserService');
-const sequelize = require('../src/config/dbinstance');
+const sequelize = require('../src/config/dbInstance');
 const SMTPServer = require('smtp-server').SMTPServer;
 const envs = require('../envs');
 

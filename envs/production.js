@@ -1,4 +1,4 @@
-const appConfig = require('../src/config/configfactory');
+const appConfig = require('../src/config/configFactory.js');
 
 const mail = appConfig.authMail;
 

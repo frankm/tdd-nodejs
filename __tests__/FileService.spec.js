@@ -1,7 +1,7 @@
 const FileService = require('../src/file/FileService');
 const fs = require('fs');
 const path = require('path');
-const appConfig = require('../src/config/configfactory');
+const appConfig = require('../src/config/configFactory.js');
 
 const { uploadDir, profileDir } = appConfig.folders;
 

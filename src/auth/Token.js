@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require('../config/dbinstance');
+const sequelize = require('../config/dbInstance');
 
 const Model = Sequelize.Model;
 

@@ -1,7 +1,7 @@
 const envs = require('../envs');
 const SmokeTest = require('./SmokeTestService');
 
-// API
+// ENVVIRONMENT TARGET
 const nodeEnv = process.env.NODE_ENV;
 console.log('smoke env =', nodeEnv);
 if (!nodeEnv) {
@@ -19,5 +19,5 @@ if (env.mail.auth) {
   SmokeTest.mustConfigSMTPWithNoAuth(env.mail);
 }
 
-// FILE SERVICES
+// FOLDER PATHS
 SmokeTest.mustConfigFolders(env.folders);

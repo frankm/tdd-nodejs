@@ -18,11 +18,12 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "dotenv": "^16.0.0",
     "env-var": "^7.1.1",
     "express": "^4.17.2",
     "express-validator": "^6.14.0",
-    "file-type": "^16.5.3",
+    "file-type": "16.5.3",
     "i18next": "^21.6.10",
     "i18next-fs-backend": "^1.1.4",
     "i18next-http-middleware": "^3.1.6",
@@ -32,10 +33,12 @@
     "sequelize": "^6.15.0",
     "sequelize-cli": "^6.4.1",
     "sqlite3": "github:mapbox/node-sqlite3",
+    "webpack": "^5.70.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-node-externals": "^3.0.0",
     "winston": "^3.6.0"
   },
   "devDependencies": {
-    "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "eslint": "^8.8.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -43,10 +46,7 @@
     "jest-watch-typeahead": "^1.0.0",
     "prettier": "^2.5.1",
     "smtp-server": "^3.9.0",
-    "supertest": "^6.2.2",
-    "webpack": "^5.70.0",
-    "webpack-cli": "^4.9.2",
-    "webpack-node-externals": "^3.0.0"
+    "supertest": "^6.2.2"
   },
   "eslintConfig": {
     "parserOptions": {

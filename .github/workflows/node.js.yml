@@ -32,7 +32,8 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: Create env file
-        env: ENV_FILE : ${{ secrets.ENV_STAGING_LOCAL }}
+        env:
+          ENV_FILE: ${{ secrets.ENV_STAGING_LOCAL }}
         run: |
           echo $ENV_FILE | base64 --decode > .env.staging.local
       - run: npm run test:staging

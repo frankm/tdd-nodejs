@@ -43,3 +43,4 @@ lerna-debug.log*
 
 # temp files
 temp*.js
+temp*.txt

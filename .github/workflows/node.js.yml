@@ -4,6 +4,11 @@
 name: Node.js CI
 
 on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for running this manually?'
+        required: true
   push:
     branches: [main]
   pull_request:
@@ -26,11 +31,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: npm ci
-      - run: npm run build --if-present
       - name: Create env file
+        env: ENV_FILE : ${{ secrets.ENV_STAGING_LOCAL }}
         run: |
-          touch .env.staging.local
-          echo ${{ secrets.ENV_STAGING_LOCAL }} > .env.staging.local
+          echo $ENV_FILE | base64 --decode > .env.staging.local
       - run: npm run test:staging
       - name: SSH Remote Commands
         uses: appleboy/ssh-action@v0.1.4

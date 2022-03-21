@@ -9,7 +9,7 @@ const customFormat = format.combine(
 
 const destinations = [new transports.Console()];
 if (process.env.NODE_ENV === 'production') {
-  destinations.push(new transports.File({ filename: 'app.log', level: 'error' }));
+  destinations.push(new transports.File({ filename: 'app.log' }));
 }
 
 const logger = createLogger({
